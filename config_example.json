@@ -1,0 +1,20 @@
+{
+  "name": "Custom DWSIM ANN Model - Heat Exchanger",
+  "description": "External neural network model for DWSIM integration",
+  "input_count": 4,
+  "output_count": 3,
+  "activation": "tanh",
+  "model_file": "model.dat",
+  "scaler_file": "scalers.dat",
+  "hidden_layers": [10],
+  "input_names": ["W_cold", "W_hot", "Tin_cold", "Tin_hot"],
+  "output_names": ["Tout_cold", "Tout_hot", "Hxeff"],
+  "training_info": {
+    "epochs": 1000,
+    "batch_size": 10,
+    "learning_rate": 0.01,
+    "validation_split": 0.30,
+    "relative_mse_tolerance": 0.001,
+    "absolute_mse_tolerance": 0.0001
+  }
+}
