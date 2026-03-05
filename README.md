@@ -135,62 +135,12 @@ openpyxl>=3.1.0
 
 ---
 
-## 🌐 Deploy on Streamlit Cloud (Share a Public Link)
-
-Streamlit Cloud lets you deploy the app **for free** and share it with anyone via a public URL — no servers needed.
-
-### Step 1 — Push your code to GitHub
-
-If your project is not already on GitHub:
-
-```bash
-# Inside your ANN_Model folder (or the parent project folder)
-git init
-git add .
-git commit -m "Initial commit - DWSIM ANN Model Studio"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-git push -u origin main
-```
-
-> ⚠️ Make sure `requirements.txt` is committed to the repository.
-
----
-
-### Step 2 — Sign up / Log in to Streamlit Cloud
-
-Go to 👉 **[https://share.streamlit.io](https://share.streamlit.io)**
-
-- Click **"Sign in with GitHub"**
-- Authorize Streamlit to access your repositories
-
----
-
-### Step 3 — Create a New App
-
-1. Click **"New app"**
-2. Fill in the form:
-
-| Field | Value |
-|-------|-------|
-| **Repository** | `YOUR_USERNAME/YOUR_REPO_NAME` |
-| **Branch** | `main` |
-| **Main file path** | `ANN_Model/streamlit_app.py` |
-
-3. Click **"Deploy!"**
-
-Streamlit Cloud will:
-- Install all packages from `requirements.txt` automatically
-- Build and launch your app in ~2–3 minutes
-
----
-
-### Step 4 — Get your shareable link
+###  Get your shareable link
 
 Once deployed, Streamlit Cloud gives you a permanent public URL like:
 
 ```
-https://YOUR_USERNAME-YOUR_REPO_NAME-streamlit-app-xxxx.streamlit.app
+https://dwsimannmodeule-vdjm4a8tk7sumwowjex5go.streamlit.app/
 ```
 
 ✅ **Share this link with anyone** — they can access the full app directly in their browser, no Python or installation required.
