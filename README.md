@@ -289,6 +289,4 @@ Pull requests are welcome! If you find a bug or want a new feature:
 
 **Made with ❤️ for Chemical Engineers**
 
-[🚀 Launch App Locally](http://localhost:8501) · [☁️ Deploy on Streamlit Cloud](https://share.streamlit.io) · [📖 DWSIM Docs](https://dwsim.readthedocs.io/)
 
-</div>
