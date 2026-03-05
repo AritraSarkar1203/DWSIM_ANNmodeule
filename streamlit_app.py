@@ -276,6 +276,21 @@ def train_model_generator(
     X = df[input_cols].values.astype(np.float32)
     y = df[output_cols].values.astype(np.float32)
 
+    # ── Drop rows that contain NaN or Inf in either X or y ────────────────────
+    finite_mask = np.isfinite(X).all(axis=1) & np.isfinite(y).all(axis=1)
+    n_dropped = int((~finite_mask).sum())
+    if n_dropped > 0:
+        # Signal the caller so a warning can be shown in the UI
+        yield {"warning": f"⚠️ {n_dropped} row(s) with NaN / Inf values were removed before training."}
+    X = X[finite_mask]
+    y = y[finite_mask]
+
+    if len(X) < 10:
+        raise ValueError(
+            f"After removing invalid rows only {len(X)} samples remain — "
+            "please check your dataset for missing or infinite values."
+        )
+
     X_train, X_val, y_train, y_val = train_test_split(
         X, y, test_size=val_split, random_state=42
     )
@@ -887,6 +902,10 @@ with tab_train:
                 if step.get("done"):
                     results = step
                     break
+                # Dataset cleaning warning (emitted before epoch 1)
+                if step.get("warning"):
+                    st.warning(step["warning"])
+                    continue
                 ep = step["epoch"]
                 total = hp["epochs"]
                 prog_bar.progress(ep / total, text=f"Epoch {ep}/{total}")
@@ -1067,17 +1086,31 @@ with tab_report:
         # ── Error distribution histogram ─────────────────────────────────────
         st.markdown('<div class="section-header">📐 Error Distribution (All Outputs)</div>', unsafe_allow_html=True)
         residuals_all = (res["y_val_pred"] - res["y_val"]).flatten()
-        fig_hist = styled_fig(figsize=(8, 3.2))
-        ax_h = fig_hist.add_subplot(111)
-        style_ax(ax_h)
-        ax_h.hist(residuals_all, bins=40, color=ACCENT1, alpha=0.8, edgecolor="none")
-        ax_h.axvline(0, color="red", linewidth=1.5, linestyle="--")
-        ax_h.set_xlabel("Residual (Predicted − Actual)")
-        ax_h.set_ylabel("Count")
-        ax_h.set_title("Residual Distribution Across All Outputs")
-        fig_hist.tight_layout()
-        st.pyplot(fig_hist, use_container_width=True)
-        plt.close(fig_hist)
+
+        # Guard: remove non-finite residuals before plotting
+        finite_res = residuals_all[np.isfinite(residuals_all)]
+        n_bad_res = len(residuals_all) - len(finite_res)
+        if n_bad_res > 0:
+            st.warning(
+                f"⚠️ {n_bad_res} non-finite residual value(s) (NaN/Inf) were excluded from the histogram. "
+                "This usually means some predictions diverged — consider reducing the learning rate, "
+                "adding Batch Normalisation, or cleaning your dataset."
+            )
+
+        if len(finite_res) == 0:
+            st.error("All residuals are non-finite — cannot plot histogram. Please retrain with a cleaned dataset.")
+        else:
+            fig_hist = styled_fig(figsize=(8, 3.2))
+            ax_h = fig_hist.add_subplot(111)
+            style_ax(ax_h)
+            ax_h.hist(finite_res, bins=40, color=ACCENT1, alpha=0.8, edgecolor="none")
+            ax_h.axvline(0, color="red", linewidth=1.5, linestyle="--")
+            ax_h.set_xlabel("Residual (Predicted − Actual)")
+            ax_h.set_ylabel("Count")
+            ax_h.set_title("Residual Distribution Across All Outputs")
+            fig_hist.tight_layout()
+            st.pyplot(fig_hist, use_container_width=True)
+            plt.close(fig_hist)
 
         # ── Export ───────────────────────────────────────────────────────────
         st.markdown('<div class="section-header">📦 Export Model Package</div>', unsafe_allow_html=True)
